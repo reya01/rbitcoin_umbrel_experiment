@@ -1,0 +1,62 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: $APP_RBITCOIN_IP
+      APP_PORT: 3012
+
+  app:
+    # UI wrapper: connection-info page (nginx:alpine + env-rendered index.html).
+    # Build with: docker build --target ui -t rbitcoin-ui:0.8.0 .
+    # Digests replace this local tag only at store submission.
+    image: rbitcoin-ui:0.8.0
+    restart: on-failure
+    depends_on:
+      - rbitcoin
+      - tor
+    environment:
+      RBITCOIN_UI_PORT: 3012
+      RBITCOIN_HOST: ${DEVICE_DOMAIN_NAME}
+      RBITCOIN_ELECTRUM_PORT: ${APP_RBITCOIN_ELECTRUM_PORT}
+      RBITCOIN_ESPLORA_PORT: ${APP_RBITCOIN_ESPLORA_PORT}
+      RBITCOIN_RPC_PORT: ${APP_RBITCOIN_RPC_PORT}
+      RBITCOIN_ELECTRUM_ONION: "${APP_RBITCOIN_ELECTRUM_HIDDEN_SERVICE}"
+      RBITCOIN_ESPLORA_ONION: "${APP_RBITCOIN_ESPLORA_HIDDEN_SERVICE}"
+    networks:
+      default:
+        ipv4_address: $APP_RBITCOIN_IP
+
+  rbitcoin:
+    # Standalone full node — verified upstream v0.8.0 musl binaries.
+    # Build with: docker build --target node -t rbitcoin-node:0.8.0 .
+    # Digests replace this local tag only at store submission.
+    image: rbitcoin-node:0.8.0
+    init: true
+    stop_grace_period: 30m
+    restart: on-failure
+    user: "1000:1000"
+    environment:
+      RBITCOIN_DATA_DIR: /data/rbitcoin
+      RBITCOIN_ELECTRUM_PORT: ${APP_RBITCOIN_ELECTRUM_PORT}
+      RBITCOIN_ESPLORA_PORT: ${APP_RBITCOIN_ESPLORA_PORT}
+      RBITCOIN_RPC_PORT: ${APP_RBITCOIN_RPC_PORT}
+    volumes:
+      - "${APP_DATA_DIR}/data:/data"
+    ports:
+      - "${APP_RBITCOIN_ELECTRUM_PORT}:${APP_RBITCOIN_ELECTRUM_PORT}"
+      - "${APP_RBITCOIN_ESPLORA_PORT}:${APP_RBITCOIN_ESPLORA_PORT}"
+      - "127.0.0.1:${APP_RBITCOIN_RPC_PORT}:${APP_RBITCOIN_RPC_PORT}"
+    networks:
+      default:
+        ipv4_address: $APP_RBITCOIN_NODE_IP
+
+  tor:
+    image: ghcr.io/getumbrel/tor:0.4.9.11@sha256:e382b8629c0dfef6ceb396b062622d4e4e955b19d6f16b883fd2c0723ad5671a
+    user: "1000:1000"
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/torrc:/etc/tor/torrc:ro
+      - ${TOR_DATA_DIR}:/data
+    environment:
+      HOME: "/tmp"

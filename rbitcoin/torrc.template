@@ -1,0 +1,14 @@
+# Tor configuration for the rbitcoin app.
+# Umbrel OS substitutes $APP_ID, $APP_RBITCOIN_NODE_IP, $APP_RBITCOIN_ELECTRUM_PORT
+# and $APP_RBITCOIN_ESPLORA_PORT when rendering this file.
+
+# Electrum server — plain TCP, protocol <= 1.6
+# (Electrum, Sparrow, Liana, Cake Wallet, BlueWallet, BitBox App, Envoy)
+HiddenServiceDir /data/app-$APP_ID-electrum
+HiddenServicePort $APP_RBITCOIN_ELECTRUM_PORT $APP_RBITCOIN_NODE_IP:$APP_RBITCOIN_ELECTRUM_PORT
+
+# Esplora HTTP API — mempool.space/electrs drop-in (BDK, Alby Hub)
+HiddenServiceDir /data/app-$APP_ID-esplora
+HiddenServicePort $APP_RBITCOIN_ESPLORA_PORT $APP_RBITCOIN_NODE_IP:$APP_RBITCOIN_ESPLORA_PORT
+
+# RPC (8332) is deliberately NOT exposed over Tor: cookie auth, localhost only.

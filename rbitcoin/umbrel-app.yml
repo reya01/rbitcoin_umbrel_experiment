@@ -1,0 +1,45 @@
+manifestVersion: 1.1
+id: rbitcoin
+implements:
+  - electrs
+category: bitcoin
+name: rbitcoin
+version: "0.8.0"
+tagline: A full Bitcoin node in Rust with a built-in Electrum server
+description: >-
+  Run your own full Bitcoin node — a standalone, pure-Rust implementation with
+  multi-peer initial block download and a built-in Electrum server, Esplora API,
+  and Bitcoin-Core-compatible RPC. Connect Electrum, Sparrow, Liana, Cake Wallet,
+  BlueWallet, BitBox App, Envoy (Electrum), BDK and Alby Hub (Esplora), or
+  Wasabi, LND, CLN (RPC) to your own node instead of a third-party server.
+
+
+  rbitcoin is the node itself, not an Electrum server bolted onto the Bitcoin
+  app — it does not depend on the Bitcoin (bitcoind) app. Initial block download
+  takes days and the full-archive datadir grows beyond 700 GB, so run it on a
+  machine with a large disk.
+
+
+  Powered by rbitcoin from reardencode (Apache-2.0 / MIT).
+developer: reardencode
+website: https://github.com/reardencode/rbitcoin
+repo: https://github.com/reardencode/rbitcoin
+support: https://github.com/reardencode/rbitcoin/issues
+port: 3012
+gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+path: ""
+defaultPassword: ""
+releaseNotes: >-
+  rbitcoin v0.8.0: schema 26 opens a 0.7 datadir in place; multi-peer initial
+  block download keeps moving on ordinary connections; consensus checks now
+  match Bitcoin Core where they used to disagree; peers and RPC fail closed
+  under load; feerates use sigop-adjusted size; block filters and silent-payment
+  tweaks build during IBD; wallet and Lightning setup guide (docs/wallets.md).
+
+
+  Full notes: https://github.com/reardencode/rbitcoin/releases/tag/v0.8.0
+backupIgnore:
+  - data/rbitcoin
